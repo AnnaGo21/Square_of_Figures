@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Positive;
 
 public class SquareSquare implements ShapeService{
 
-    @Positive(message = "Side length must be a positive value.")
+    @Positive(message = "Side length must be a positive value")
     private int side;
 
     public SquareSquare(int side) {

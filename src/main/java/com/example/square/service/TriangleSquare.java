@@ -1,9 +1,6 @@
 package com.example.square.service;
 
-import com.example.square.model.FigureType;
-import com.example.square.request.FigureRequest;
 import jakarta.validation.constraints.Positive;
-import org.springframework.stereotype.Service;
 
 public class TriangleSquare implements ShapeService{
 
