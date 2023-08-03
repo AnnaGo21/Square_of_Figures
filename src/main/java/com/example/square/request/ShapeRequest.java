@@ -10,36 +10,38 @@ import com.example.square.service.SquareSquare;
 import com.example.square.service.TriangleSquare;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class ShapeRequest {
+    @NotNull
     private String type;
 
+    @NotNull
     @PositiveArray(message = "Dimension values must be positive values")
     private int[] dimensions;
 
     @JsonIgnore
     @JsonCreator
     public ShapeService getShape() {
-        switch (FigureType.valueOf(type.toUpperCase())) {
-            case TRIANGLE:
-                if (dimensions.length != 2) {
-                    throw new InvalidDimensionsException("Triangle requires two dimensions: base and height");
-                }
-                return new TriangleSquare(dimensions[0], dimensions[1]);
-            case SQUARE:
-                if (dimensions.length != 1) {
-                    throw new InvalidDimensionsException("Square requires one dimension: side");
-                }
-                return new SquareSquare(dimensions[0]);
-            case RECTANGLE:
-                if (dimensions.length != 2) {
-                    throw new InvalidDimensionsException("Rectangle requires two dimensions: length and width");
-                }
-                return new RectangleSquare(dimensions[0], dimensions[1]);
-            default:
-                throw new InvalidRequestException("Invalid shape type");
+        if (FigureType.TRIANGLE.name().equalsIgnoreCase(type)) {
+            if (dimensions.length != 2) {
+                throw new InvalidDimensionsException("Triangle requires two dimensions: base and height");
+            }
+            return new TriangleSquare(dimensions[0], dimensions[1]);
+        } else if (FigureType.SQUARE.name().equalsIgnoreCase(type)) {
+            if (dimensions.length != 1) {
+                throw new InvalidDimensionsException("Square requires one dimension: side");
+            }
+            return new SquareSquare(dimensions[0]);
+        } else if (FigureType.RECTANGLE.name().equalsIgnoreCase(type)) {
+            if (dimensions.length != 2) {
+                throw new InvalidDimensionsException("Rectangle requires two dimensions: length and width");
+            }
+            return new RectangleSquare(dimensions[0], dimensions[1]);
+        } else {
+            throw new InvalidRequestException("Invalid shape type");
         }
     }
 }
