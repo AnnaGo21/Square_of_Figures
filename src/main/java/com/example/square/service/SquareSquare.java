@@ -1,10 +1,11 @@
 package com.example.square.service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Positive;
 
 public class SquareSquare implements ShapeService{
 
-    @Positive(message = "Side length must be a positive value")
+    @JsonProperty("side")
     private int side;
 
     public SquareSquare(int side) {

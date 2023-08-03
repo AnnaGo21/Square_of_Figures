@@ -1,19 +1,30 @@
 package com.example.square;
 
 import com.example.square.controller.SquareController;
-import com.example.square.exception.InvalidDimensionsException;
-import com.example.square.exception.InvalidRequestException;
 import com.example.square.request.ShapeRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 public class CalculationTests {
+    @Autowired
+    private MockMvc mockMvc;
 
     private SquareController squareController;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     public void setUp() {
@@ -24,10 +35,9 @@ public class CalculationTests {
     public void testCalculateAreaWithValidTriangle() {
         ShapeRequest shapeRequest = new ShapeRequest();
         shapeRequest.setType("triangle");
-        shapeRequest.setDimensions(new int[]{5, 4});
+        shapeRequest.setDimensions(new int[]{5,4});
 
         ResponseEntity<Integer> response = squareController.calculateSquare(shapeRequest);
-
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(10, response.getBody());
@@ -64,33 +74,47 @@ public class CalculationTests {
         ShapeRequest shapeRequest = new ShapeRequest();
         shapeRequest.setType("circle");
 
-        assertThrows(InvalidRequestException.class, () -> squareController.calculateSquare(shapeRequest));
+        assertThrows(IllegalArgumentException.class, () -> squareController.calculateSquare(shapeRequest));
     }
 
     @Test
-    public void testCalculateAreaWithInvalidTriangleDimensions() {
+    public void testCalculateAreaWithInvalidTriangleDimensions() throws Exception {
         ShapeRequest shapeRequest = new ShapeRequest();
         shapeRequest.setType("triangle");
         shapeRequest.setDimensions(new int[]{5, -2});
 
-        assertThrows(InvalidDimensionsException.class, () -> squareController.calculateSquare(shapeRequest));
+        String shapeRequestJsonString = objectMapper.writeValueAsString(shapeRequest);
+
+        mockMvc.perform(post("/square/calculate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(shapeRequestJsonString))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void testCalculateAreaWithInvalidSquareDimensions() {
+    public void testCalculateAreaWithInvalidSquareDimensions() throws Exception {
         ShapeRequest shapeRequest = new ShapeRequest();
         shapeRequest.setType("square");
         shapeRequest.setDimensions(new int[]{0});
 
-        assertThrows(InvalidDimensionsException.class, () -> squareController.calculateSquare(shapeRequest));
+        String shapeRequestJsonString = objectMapper.writeValueAsString(shapeRequest);
+
+        mockMvc.perform(post("/square/calculate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(shapeRequestJsonString))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void testCalculateAreaWithInvalidRectangleDimensions() {
+    public void testCalculateAreaWithInvalidRectangleDimensions() throws Exception {
         ShapeRequest shapeRequest = new ShapeRequest();
         shapeRequest.setType("rectangle");
         shapeRequest.setDimensions(new int[]{4, -3});
 
-        assertThrows(InvalidDimensionsException.class, () -> squareController.calculateSquare(shapeRequest));
+        String shapeRequestJsonString = objectMapper.writeValueAsString(shapeRequest);
+        mockMvc.perform(post("/square/calculate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(shapeRequestJsonString))
+                .andExpect(status().isBadRequest());
     }
 }

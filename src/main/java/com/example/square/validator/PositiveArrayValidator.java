@@ -8,15 +8,13 @@ public class PositiveArrayValidator implements ConstraintValidator<PositiveArray
     @Override
     public boolean isValid(int[] value, ConstraintValidatorContext context) {
         if (value == null) {
-            return true;
+            return false;
         }
-
         for (int i : value) {
             if (i <= 0) {
                 return false;
             }
         }
-
         return true;
     }
 }

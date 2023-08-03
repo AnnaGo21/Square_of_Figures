@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/square")
 public class SquareController {
+
     @PostMapping("/calculate")
     public ResponseEntity<Integer> calculateSquare(@RequestBody @Valid ShapeRequest shapeRequest) {
         ShapeService shape = shapeRequest.getShape();
 
         if (shape == null) {
-            throw new InvalidDimensionsException("Invalid shape type.");
+            throw new InvalidRequestException("Invalid shape type.");
         }
 
         int area = shape.calculateSquare();
